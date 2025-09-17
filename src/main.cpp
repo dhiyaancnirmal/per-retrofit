@@ -1,20 +1,25 @@
 #include <Arduino.h>
 #include "FlexCAN_T4.h"
 #include "DFRobot_BMM350.h"
+#include <Wire.h>
 
 // Pins for CAN1: (CRX1 -> pin 23) (CTX1 --> pin 22)
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> can1; // Use CAN 2.0 constructor template
 
 
 // Pins for I2C: (SCL --> pin 19) (SDA --> pin 18)
-Wire.begin()
-DFRobot_BMM350_I2C bmm350(&Wire, I2C_ADDRESS);
+
+//I2C_ADDRESS: ; - Input address when we have sensor.
+
+DFRobot_BMM350_I2C bmm350(&Wire, 0x14);
 
 // put function declarations here:
 void canSniff(const CAN_message_t &msg);
 
 void setup() {
   // put your setup code here, to run once:
+
+  Wire.begin();
   can1.begin();
   can1.setBaudRate(500000); // Set CAN bitrate, 500kb
   can1.setMaxMB(16);
@@ -31,7 +36,7 @@ void setup() {
   } Serial.println("bmm350 init success!");
 
   Serial.println(bmm350.selfTest());
-  bmm350.setOperationMode(BMM350_NORMAL_MODE);
+  bmm350.setOperationMode(eBmm350NormalMode);
   bmm350.setPresetMode(BMM350_PRESETMODE_HIGHACCURACY);
   bmm350.setRate(BMM350_DATA_RATE_25HZ);
   bmm350.setMeasurementXYZ();
